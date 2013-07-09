@@ -30,48 +30,8 @@ app.get('/hello', function (request, response) {
   response.send('Hello World');
 });
 
-var getHeader = function(filename) {
-  if (/\.css$/.test(filename)) {
-    return { 'content-type': 'text/css' };
-  }
-  if (/\.js$/.test(filename)) {
-    return { 'content-type': 'text/javascript' };
-  }
-  if (/\.json$/.test(filename)) {
-    return { 'content-type': 'application/json' };
-  }
-  if (/\.png$/.test(filename)) {
-    return { 'content-type': 'image/png' };
-  }
-  return {};
-};
-
-var pushStaticContent = function(response) {
-  var staticDir = __dirname + '/../static/thoughtWorks_files/';
-  var filenames = fs.readdirSync(staticDir).slice(0,5);
-  filenames.forEach(function(filename) {
-  //var filename = filenames[0];
-    if (fs.lstatSync(staticDir + filename).isFile()) {
-      response.push('/thoughtWorks_files/' + filename, getHeader(filename), function(error, stream) {
-        if (error) throw error;
-        console.log(filename);
-        stream.end(fs.readFileSync(staticDir + filename));
-      });
-    }
-  });
-};
-
-// When the home page is requested, push some static resources as well
-// TODO Don't send the static resources if the page is requested again later by the same client
-app.get('/', function (request, response) {
-  if (response.push) {
-    pushStaticContent(response);
-  }
-  response.sendfile('app/static/tw.html');
-});
-
 // Serve files from the app/static directory
-app.get(/\/.+/, function (request, response) {
+app.get('/*', function (request, response) {
   response.sendfile('app/static' + request.path);
 });
 
