@@ -40,7 +40,7 @@ http.createServer(app).listen(httpPort);
 var httpsPort = 8443;
 https.createServer(sslOptions, app).listen(httpsPort);
 
-var spdyPort = 9443;
+var spdyPort = 10443;
 spdy.createServer(sslOptions, app).listen(spdyPort);
 
 console.log('Server listening on HTTP port ' + httpPort + ', HTTPS port ' + httpsPort + ', and SPDY port ' + spdyPort);
