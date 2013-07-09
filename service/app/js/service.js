@@ -30,6 +30,17 @@ app.get('/hello', function (request, response) {
   response.send('Hello World');
 });
 
+// When the '/tw.html' home page is requested as '/', push some static resources as well
+app.get('/', function (request, response) {
+  if (response.push) {
+    response.push('/thoughtWorks_files/jquery.min.js', {'content-type':'text/javascript'}, function(error, stream) {
+      if (error) throw error;
+      stream.end(fs.readFileSync(__dirname + '/../static/thoughtWorks_files/jquery.min.js'));
+    });
+  }
+  response.sendfile('app/static/tw.html');
+});
+
 // Serve files from the app/static directory
 app.get('/*', function (request, response) {
   response.sendfile('app/static' + request.path);
