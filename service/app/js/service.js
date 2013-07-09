@@ -3,9 +3,10 @@ var express = require('express')
   , crypto = require('crypto')
   , fs = require('fs')
   , http = require('http')
+  , https = require('https')
   , spdy = require('spdy');
 
-var spdyOptions = {
+var sslOptions = {
   key: fs.readFileSync(__dirname + '/../keys/spdylab.key'),
   cert: fs.readFileSync(__dirname + '/../keys/spdylab.crt'),
   ca: fs.readFileSync(__dirname + '/../keys/cacert.pem'),
@@ -37,7 +38,10 @@ var httpPort = 8080;
 http.createServer(app).listen(httpPort);
 
 var httpsPort = 8443;
-spdy.createServer(spdyOptions, app).listen(httpsPort);
+https.createServer(sslOptions, app).listen(httpsPort);
 
-console.log('Server listening on HTTP port ' + httpPort + ' and HTTPS port ' + httpsPort);
+var spdyPort = 9443;
+spdy.createServer(sslOptions, app).listen(spdyPort);
+
+console.log('Server listening on HTTP port ' + httpPort + ', HTTPS port ' + httpsPort + ', and SPDY port ' + spdyPort);
 
