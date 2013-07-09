@@ -7,9 +7,9 @@ var express = require('express')
   , spdy = require('spdy');
 
 var sslOptions = {
-  key: fs.readFileSync(__dirname + '/../keys/spdylab.key'),
-  cert: fs.readFileSync(__dirname + '/../keys/spdylab.crt'),
-  ca: fs.readFileSync(__dirname + '/../keys/cacert.pem'),
+  key: fs.readFileSync(__dirname + '/../ssh/localhost.key'),
+  cert: fs.readFileSync(__dirname + '/../ssh/localhost.crt'),
+  ca: fs.readFileSync(__dirname + '/../ca/cacert.pem'),
   ciphers: 'HIGH:!DSS:!DH:!CAMELLIA:!aGOST:!AESGCM:!aNULL@STRENGTH'
 };
 

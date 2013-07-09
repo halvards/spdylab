@@ -27,3 +27,6 @@ tmp
 *.iws
 *.swp
 
+service/app/ca
+service/app/ssh
+
