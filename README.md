@@ -1,9 +1,9 @@
 # spdylab
 
 This is code for a lab exercise to explore the
-[http://www.chromium.org/spdy](SPDY protocol).
+[SPDY protocol](http://www.chromium.org/spdy).
 
-There is also a [http://halvards.github.io/spdylab/](slide deck)
+There is also a [slide deck](http://halvards.github.io/spdylab/)
 available for the associated brief presentation that accompanied the lab
 exercises.
 
@@ -14,14 +14,14 @@ network interface (for localhost/127.0.0.1). This makes the simulation
 of a remote server more realistic.
 
 The scripts use the `tc` (traffic control) command available in the
-[http://www.linuxfoundation.org/collaborate/workgroups/networking/netem](netem)
+[netem](http://www.linuxfoundation.org/collaborate/workgroups/networking/netem)
 package for Linux and must be run as sudo. They have been tested on
 Ubuntu 12.04.
 
 The `service` directory contains an
-[http://expressjs.com/](ExpressJS) server (based on
-[http://nodejs.org/](NodeJS)) hosting static files (actually a copy of
-the ThoughtWorks.com home page).
+[ExpressJS](http://expressjs.com/) server (based on
+[NodeJS](http://nodejs.org/)) hosting static files (actually a copy of
+the [ThoughtWorks home page](http://www.thoughtworks.com/)).
 
 The implementation of the service is in the file
 `service/app/js/service.js`.
@@ -50,6 +50,6 @@ to the existing locations.
 
 As the setup is quite involved (certificates, keys in Wireshark, traffic
 control scripts), a Vagrant-based Ubuntu virtual machine was created for
-this lab exercise. It can be found here, called `lab`:
+this lab exercise. It can be found here, called _lab_:
 [https://github.com/halvards/vagrant-vm](https://github.com/halvards/vagrant-vm).
 
