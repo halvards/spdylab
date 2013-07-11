@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ThoughtWorks</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" media="all" href="theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="theme/css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+</head>
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+    <!-- <p>Add <code><a href="?presentme=true" target="_self">?presentme=true</a></code> to the URL to enabled presenter mode. -->
+    <!-- This setting is sticky, meaning refreshing the page will persist presenter mode.</p> -->
+    <!-- <p>Hit <code><a href="?presentme=false" target="_self">?presentme=false</a></code> to disable presenter mode.</p> -->
+
+  <slide class="logoslide nobackground">
+    <article class="flexbox vcenter">
+      <span><img src="images/tw-bracketed-logo-color_617x200.png"></span>
+    </article>
+  </slide>
+
+  <slide class="title-slide segue nobackground">
+    <aside class="twbar"><img src="images/tw_brackets_color_128x128.png"></aside>
+    <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+    </hgroup>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Agenda</h2>
+    </hgroup>
+    <article>
+        <P>This <em>is not</em> an in-depth explanation of the protocol</p>
+        <p>This <em>is</em> an overview of the main features with enough detail to get into some hands-on exercises.</p>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>What is SPDY?</h2>
+    </hgroup>
+    <article>
+      <ul>
+        <li>An experimental protocol from Google</li>
+        <li>The starting point for IETF's HTTP 2.0 standardisation work</li>
+        <li>Not an acronym</li>
+        <li>Pronounced 'speedy'</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <article>
+      <iframe data-src="http://http2.github.io/http2-spec/"></iframe>
+    </article>
+  </slide>
+
+  <slide>
+    <aside class="note">
+      <section>
+        <ul>
+          <li>No information on Safari</li>
+        </ul>
+      </section>
+    </aside>
+    <hgroup>
+      <h2>Who supports it?</h2>
+    </hgroup>
+    <article>
+      <p><strong>Browsers:</strong> <br>Chrome (desktop, iOS, Andriod), Firefox, Opera, IE 11+ (!)</p>
+      <p><strong>Websites:</strong> <br>Google, Facebook, Twitter, GitHub, etc.</p>
+      <p><strong>Application servers/platforms:</strong> <br>Apache (mod_spdy), Nginx, Ruby, Python, NodeJS, Java (Jetty and Netty), etc.</p>
+    </article>
+  </slide>
+
+  <slide>
+    <aside class="note">
+      <section>
+        <ul>
+          <li>Browsers open up to 6 connections (was 2)</li>
+          <li>These connections take time to warm up</li>
+          <li>TCP slow start important: Initial congestion window (init_cwnd)</li>
+          <li>Redundant User-Agent, etc.</li>
+        </ul>
+      </section>
+    </aside>
+    <hgroup>
+      <h2>What is wrong with HTTP 1.1?</h2>
+    </hgroup>
+    <article>
+      <p>Not designed to minimise latency:</p>
+      <ul>
+        <li>Single request per connection</li>
+        <li>Only client-initiated requests</li>
+        <li>Headers are not compressed</li>
+        <li>Optional data compression</li>
+        <li>Redundant headers</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide class="segue dark quote nobackground">
+    <aside class="twbar right bottom"><img src="images/tw_brackets_color_128x128.png"></aside>
+    <article class="flexbox vleft auto-fadein">
+      <q>
+        SPDY's purpose is to improve end-user perceived latency.
+      </q>
+    </article>
+  </slide>
+
+
+  <slide>
+    <aside class="note">
+      <section>
+        <ul>
+          <li>It's binary!</li>
+          <li>Not much support for request prioritisation.</li>
+        </ul>
+      </section>
+    </aside>
+    <hgroup>
+      <h2>How does SPDY achieve that?</h2>
+    </hgroup>
+    <article>
+      <ul class="build">
+        <li>Multiplexing requests on a single connection</li>
+        <li>Header compression</li>
+        <li>Server push </li>
+        <li>Server hint</li>
+        <li>Request prioritisation</li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>The Protocol Stack</h2>
+    </hgroup>
+    <article class="flexbox vcenter">
+      <img src="images/spdy-protocol-stack.png" alt="SPDY protocol stack" title="Description" width="150%">
+      <footer class="source">source: More Bandwidth Doesn’t Matter (much), Mike Belshe</footer>
+    </article>
+  </slide>
+
+  <slide>
+    <aside class="note">
+      <section>
+        <ul>
+          <li>Browsers open up to 6 connections (used to be 2)</li>
+          <li>These connections take time to warm up</li>
+          <li>TCP slow start important: Initial congestion window (init_cwnd)</li>
+        </ul>
+      </section>
+    </aside>
+    <hgroup>
+      <h2>SPDY Multiplexing</h2>
+    </hgroup>
+    <article class="flexbox vcenter">
+      <object data="images/spdy-multiplexing.svg" type="image/svg+xml" width="700px"></object>
+    </article>
+  </slide>
+
+  <slide>
+    <aside class="note">
+      <section>
+        <ul>
+          <li>CRIME attack: Compression and encryption don't go well together.</li>
+          <li>Compression means more information is leaked. Not great for sensitive headers like session cookies.</li>
+        </ul>
+      </section>
+    </aside>
+    <hgroup>
+      <h2>Header Compression</h2>
+    </hgroup>
+    <article>
+      <p>Fast zlib compression</p>
+      <p>Cookies are not compressed (CRIME attack)</p>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Server push</h2>
+      <h3>Shove resources down browsers's throats</h3>
+    </hgroup>
+    <article>
+      <pre class="prettyprint" data-lang="javascript">
+<b>if (request.url === '/index.html'</b> && response.push) {
+  <b>response.push('/jquery.js'</b>, {'Content-Type': 'text/javascript'}, 
+      function(err, stream) {
+        stream.end(fs.readFileSync('/jquery.js'));
+      });
+}
+</pre>
+    </article>
+  </slide>
+
+  <slide>
+    <hgroup>
+      <h2>Server hint</h2>
+      <h3>More polite than push</h3>
+    </hgroup>
+    <article>
+      <p>Request:</p>
+      <pre class="prettyprint">
+<b>GET /index.html</b> HTTP/1.1
+Host: www.server.com
+</pre>
+      <p>Response:</p>
+      <pre class="prettyprint">
+HTTP/1.1 200 OK
+Content-Type: text/html
+<b>Link: &lt;/jquery.js&gt;; rel=prefetch</b>
+</pre>
+    </article>
+  </slide>
+
+  <slide>
+    <article>
+      <iframe data-src="https://docs.google.com/a/chromium.org/viewer?a=v&pid=sites&srcid=Y2hyb21pdW0ub3JnfGRldnxneDoxMzcyOWI1N2I4YzI3NzE2"></iframe>
+    </article>
+  </slide>
+
+  <slide class="thank-you-slide segue nobackground">
+    <aside class="twbar right"><img src="images/tw_brackets_color_128x128.png"></aside>
+    <article class="flexbox vleft auto-fadein">
+      <h2>Let's code!</h2>
+    </article>
+    <p class="auto-fadein" data-config-contact>
+      <!-- populated from slide_config.json -->
+    </p>
+  </slide>
+
+  <slide>
+    <hgroup>
+     <h2>References</h2>
+    </hgroup>
+    <article>
+      <ul>
+        <li>Mike Belshe: <a href="https://docs.google.com/a/chromium.org/viewer?a=v&pid=sites&srcid=Y2hyb21pdW0ub3JnfGRldnxneDoxMzcyOWI1N2I4YzI3NzE2">More Bandwidth Doesn’t Matter (Much)</a></li>
+        <li>IETF Draft: <a href="http://http2.github.io/http2-spec/">Hypertext Transfer Protocol version 2.0</a></li>
+        <li>Chris Strom: <a href="http://pragprog.com/book/csspdy/the-spdy-book">The SPDY Book</a></li>
+        <li><a href="https://github.com/indutny/node-spdy">NodeJS SPDY module</a></li>
+        <li><a href="https://github.com/igrigorik/spdy">Ruby SPDY gem</a></li>
+        <li><a href="http://www.eclipse.org/jetty/documentation/current/spdy.html">Jetty's SPDY modules</a></li>
+        <li>Chromium: <a href="http://www.chromium.org/spdy">SPDY resources</a></li>
+      </ul>
+    </article>
+  </slide>
+
+  <slide class="logoslide nobackground">
+    <article class="flexbox vcenter">
+      <span><img src="images/tw-bracketed-logo-color_617x200.png"></span>
+    </article>
+  </slide>
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+</body>
+</html>
