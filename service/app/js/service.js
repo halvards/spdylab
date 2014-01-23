@@ -8,9 +8,9 @@ var express = require('express')
 // Set up server private key, public key certificate and CA certificate
 // The ciphers options prevents using some ciphers not supported by Wireshark, such as DH and CAMELLIA
 var sslOptions = {
-  key: fs.readFileSync(__dirname + '/../ssh/localhost.key'),
-  cert: fs.readFileSync(__dirname + '/../ssh/localhost.crt'),
-  ca: fs.readFileSync(__dirname + '/../ca/cacert.pem'),
+  key: fs.readFileSync(process.env.HOME + '/.ssh/localhost.key'),
+  cert: fs.readFileSync(process.env.HOME + '/.ssh/localhost.crt'),
+  ca: fs.readFileSync(process.env.HOME + '/.ca/cacert.pem'),
   ciphers: 'HIGH:!DSS:!DH:!CAMELLIA:!aGOST:!AESGCM:!aNULL@STRENGTH'
 };
 
@@ -27,18 +27,52 @@ app.configure(function () {
 // Hello World
 app.get('/hello', function (request, response) {
   response.set('Content-Type', 'text/plain');
-  response.send('Hello World');
+  response.send('Hello World!');
 });
+
+var getContentType = function(filename) {
+  if (/\.css$/.test(filename)) {
+    return { 'content-type': 'text/css' };
+  }
+  if (/\.js$/.test(filename)) {
+    return { 'content-type': 'text/javascript' };
+  }
+  if (/\.json$/.test(filename)) {
+    return { 'content-type': 'application/json' };
+  }
+  if (/\.png$/.test(filename)) {
+    return { 'content-type': 'image/png' };
+  }
+  if (/\.ico$/.test(filename)) {
+    return { 'content-type': 'image/x-icon' };
+  }
+  if (/\.html?$/.test(filename)) {
+    return { 'content-type': 'text/html' };
+  }
+  if (/\.txt$/.test(filename)) {
+    return { 'content-type': 'text/plain' };
+  }
+  return {};
+};
+
+var pushStaticContent = function(response) {
+  var staticDir = __dirname + '/../static/thoughtWorks_files/';
+  fs.readdirSync(staticDir).forEach(function(filename) {
+    if (fs.lstatSync(staticDir + filename).isFile()) {
+      var stream = response.push('/thoughtWorks_files/' + filename, getContentType(filename));
+      stream.on('error', function(error) { throw error; });
+      stream.end(fs.readFileSync(staticDir + filename));
+    }
+  });
+};
 
 // When the '/tw.html' home page is requested as '/', push some static resources as well
 app.get('/', function (request, response) {
   if (response.push) {
-    response.push('/thoughtWorks_files/jquery.min.js', {'content-type':'text/javascript'}, function(error, stream) {
-      if (error) throw error;
-      stream.end(fs.readFileSync(__dirname + '/../static/thoughtWorks_files/jquery.min.js'));
-    });
+    pushStaticContent(response);
   }
-  response.sendfile('app/static/tw.html');
+  response.writeHead(200, { 'content-type': 'text/html' });
+  response.end(fs.readFileSync(__dirname + '/../static/tw.html'));
 });
 
 // Serve files from the app/static directory
