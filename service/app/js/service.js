@@ -8,8 +8,8 @@ var express = require('express')
 // Set up server private key, public key certificate and CA certificate
 // The ciphers options prevents using some ciphers not supported by Wireshark, such as DH and CAMELLIA
 var sslOptions = {
-  key: fs.readFileSync(process.env.HOME + '/.ssh/localhost.key'),
-  cert: fs.readFileSync(process.env.HOME + '/.ssh/localhost.crt'),
+  key: fs.readFileSync(process.env.HOME + '/.ssh/lab.vagrantup.com.key'),
+  cert: fs.readFileSync(process.env.HOME + '/.ssh/lab.vagrantup.com.crt'),
   ca: fs.readFileSync(process.env.HOME + '/.ca/cacert.pem'),
   ciphers: 'HIGH:!DSS:!DH:!CAMELLIA:!aGOST:!AESGCM:!aNULL@STRENGTH'
 };
