@@ -20,7 +20,7 @@ apply plugin: 'java'            // http://www.gradle.org/docs/current/userguide/
 
 // http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.6'
+    gradleVersion = '1.10'
 }
 
 // Run the server using 'gradle run' with the help of the application plugin
@@ -44,8 +44,8 @@ dependencies {
             "org.eclipse.jetty:jetty-security:${jettyVersion}",
             "org.eclipse.jetty:jetty-webapp:${jettyVersion}",
             "org.slf4j:slf4j-api:${slf4jVersion}",
-            "org.slf4j:slf4j-simple:${slf4jVersion}"
-//            "org.mortbay.jetty.npn:npn-boot:${npnBootVersion}"
+            "org.slf4j:slf4j-simple:${slf4jVersion}",
+            "org.mortbay.jetty.npn:npn-boot:${npnBootVersion}"  // not required, included for browsing the source code
 
     testCompile "junit:junit:4.11"
 }
