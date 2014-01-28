@@ -1,0 +1,63 @@
+def version = '1.0.0'
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
+
+apply plugin: 'application'     // http://www.gradle.org/docs/current/userguide/application_plugin.html
+apply plugin: 'idea'            // http://www.gradle.org/docs/current/userguide/idea_plugin.html
+apply plugin: 'java'            // http://www.gradle.org/docs/current/userguide/java_plugin.html
+
+// http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.6'
+}
+
+// Ensure the IWS Workspace file is also deleted (this is not the default)
+task cleanIdea(dependsOn: [cleanIdeaProject, cleanIdeaWorkspace, cleanIdeaModule],
+               type: Delete,
+               overwrite: true,
+               description: 'Cleans IDEA project files (IML, IPR, IWS)',
+               group: 'IDE')
+
+// Tell IntelliJ IDEA that the VCS for this project is Git
+idea.project.ipr {
+    withXml { provider ->
+        provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
+        provider.node.component.find { it.@name == 'ProjectRootManager' }.@"assert-jdk-15" = 'true'
+        provider.node.component.find { it.@name == 'ProjectRootManager' }.@languageLevel = 'JDK_1_7'
+    }
+}
+
+mainClassName = 'com.thoughtworks.spdylab.server.JettySpdyServer'
+
+idea.module {
+    downloadSources = true  // tells Ivy to download sources jar files as well
+}
+
+repositories {
+    mavenCentral()
+}
+
+jar.manifest {
+    attributes("Implementation-Title": "Jetty SPDY Server", "Implementation-Version": version)
+}
+
+dependencies {
+    def jettyVersion = "9.1.1.v20140108"
+    def slf4jVersion = "1.7.5"
+    def npnBootVersion = "1.1.6.v20130911"  // for JDK 1.7.0_45
+
+    compile "org.eclipse.jetty.spdy:spdy-http-server:${jettyVersion}",
+            "org.eclipse.jetty:jetty-jmx:${jettyVersion}",
+            "org.eclipse.jetty:jetty-security:${jettyVersion}",
+            "org.eclipse.jetty:jetty-webapp:${jettyVersion}",
+            "org.slf4j:slf4j-api:${slf4jVersion}",
+            "org.slf4j:slf4j-simple:${slf4jVersion}"
+//            "org.mortbay.jetty.npn:npn-boot:${npnBootVersion}"
+
+    testCompile "junit:junit:4.11"
+}
+

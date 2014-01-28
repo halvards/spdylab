@@ -14,6 +14,7 @@ results
 npm-debug.log
 
 build
+classes
 node_modules
 out
 projectFilesBackup*
@@ -26,7 +27,4 @@ tmp
 *.ipr
 *.iws
 *.swp
-
-service/app/ca
-service/app/ssh
 
