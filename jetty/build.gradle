@@ -1,29 +1,15 @@
-def version = '1.0.0'
-
 // Download Jetty npn-boot JAR
-def npnBootVersion = "1.1.6.v20130911"  // for JDK 1.7.0_45
+def npnBootVersion = rootProject.ext.npnBootVersion
 ant.mkdir(dir: "support")
 ant.get(src: "http://central.maven.org/maven2/org/mortbay/jetty/npn/npn-boot/${npnBootVersion}/npn-boot-${npnBootVersion}.jar",
         dest: "./support/npn-boot-${npnBootVersion}.jar",
         skipexisting: true,
         verbose: "on")
 
-buildscript {
-  repositories {
-    mavenCentral()
-  }
-}
-
 apply plugin: 'application'     // http://www.gradle.org/docs/current/userguide/application_plugin.html
-apply plugin: 'idea'            // http://www.gradle.org/docs/current/userguide/idea_plugin.html
 apply plugin: 'java'            // http://www.gradle.org/docs/current/userguide/java_plugin.html
 
-// http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.10'
-}
-
-// Run the server using 'gradle run' with the help of the application plugin
+// Run the server using './gradlew run' with the help of the application plugin
 mainClassName = 'com.thoughtworks.spdylab.server.JettySpdyServer'
 applicationDefaultJvmArgs = ["-Xbootclasspath/p:./support/npn-boot-${npnBootVersion}.jar"]
 
@@ -32,14 +18,14 @@ repositories {
 }
 
 jar.manifest {
-    attributes("Implementation-Title": "Jetty HTTP 2.0/SPDY Server", "Implementation-Version": version)
+    attributes("Implementation-Title": "Jetty HTTP 2.0/SPDY Server", "Implementation-Version": "1.0.0")
 }
 
 dependencies {
     def jettyVersion = "9.1.1.v20140108"
     def slf4jVersion = "1.7.5"
 
-    compile "org.eclipse.jetty.spdy:spdy-http-server:${jettyVersion}",
+    compile "org.eclipse.jett/usr/bin/env nodey.spdy:spdy-http-server:${jettyVersion}",
             "org.eclipse.jetty:jetty-jmx:${jettyVersion}",
             "org.eclipse.jetty:jetty-security:${jettyVersion}",
             "org.eclipse.jetty:jetty-webapp:${jettyVersion}",
@@ -50,71 +36,7 @@ dependencies {
     testCompile "junit:junit:4.11"
 }
 
-// --- IntelliJ IDEA Settings ---
-
-// Ensure the IWS Workspace file is also deleted (this is not the default)
-task cleanIdea(dependsOn: [cleanIdeaProject, cleanIdeaWorkspace, cleanIdeaModule],
-               type: Delete,
-               overwrite: true,
-               description: 'Cleans IDEA project files (IML, IPR, IWS)',
-               group: 'IDE')
-
-def gradleProjectConfiguration = '''
-  <component name="GradleSettings">
-    <option name="linkedExternalProjectsSettings">
-      <GradleProjectSettings>
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-    </option>
-  </component>
-'''
-
-// IntelliJ IDEA Project configuration. To use, run 'gradle idea' to generate project files.
-// VcsDirectoryMappings and ProjectRootManager settings are only required for IntelliJ version 12 and below.
-idea.project.ipr {
-    withXml { provider ->
-        provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@directory = '$PROJECT_DIR$/..'
-        provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
-        provider.node.component.find { it.@name == 'ProjectRootManager' }.@"assert-jdk-15" = 'true'
-        provider.node.component.find { it.@name == 'ProjectRootManager' }.@languageLevel = 'JDK_1_7'
-        provider.node.append(new XmlParser().parseText(gradleProjectConfiguration))
-    }
-}
-
-def startServerRunConfiguration = """\
-    <configuration default="false" name="JettySpdyServer" type="Application" factoryName="Application" singleton="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.thoughtworks.spdylab.server.JettySpdyServer" />
-      <option name="VM_PARAMETERS" value="-Xbootclasspath/p:./support/npn-boot-${npnBootVersion}.jar" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://\$PROJECT_DIR\$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="jetty" />
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-"""
-
-idea.workspace.iws {
-    withXml { workspace ->
-        // Add run configurations for convenience
-        def runManagerComponentNode = workspace.node.component.find { it.@name == 'RunManager' }
-        runManagerComponentNode.append(new XmlParser().parseText(startServerRunConfiguration))
-        runManagerComponentNode.@selected = 'Application.JettySpdyServer'
-    }
-}
-
 idea.module {
     downloadSources = true  // tells Ivy to download sources jar files as well
 }
+

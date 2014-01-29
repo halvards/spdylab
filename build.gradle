@@ -1,0 +1,92 @@
+apply plugin: 'idea'           // http://www.gradle.org/docs/current/userguide/idea_plugin.html
+
+subprojects {
+    apply plugin: 'idea'
+}
+
+// http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.10'
+}
+
+// Ensure the IWS Workspace file is also deleted (this is not the default)
+task cleanIdea(dependsOn: [cleanIdeaProject, cleanIdeaWorkspace, cleanIdeaModule],
+               type: Delete,
+               overwrite: true,
+               description: 'Cleans IDEA project files (IML, IPR, IWS)',
+               group: 'IDE')
+
+task clean(description: 'Deletes the build directory produced by Gradle and the out directory produced by IntelliJ IDEA.',
+           group: 'build') << {
+    delete "${buildDir}", 'out'
+}
+
+// IntelliJ IDEA Project configuration. To use, run './gradlew idea' to generate project files.
+def gradleProjectConfiguration = '''
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+'''
+
+// VcsDirectoryMappings and ProjectRootManager settings are only required for IntelliJ version 12 and below.
+idea.project.ipr {
+    withXml { provider ->
+        provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@directory = '$PROJECT_DIR$'
+        provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = 'Git'
+        provider.node.component.find { it.@name == 'ProjectRootManager' }.@"assert-jdk-15" = 'true'
+        provider.node.component.find { it.@name == 'ProjectRootManager' }.@languageLevel = 'JDK_1_7'
+        provider.node.append(new XmlParser().parseText(gradleProjectConfiguration))
+    }
+}
+
+// Define JAR version of npn-boot. Would have liked to do this in the jetty subproject, but I couldn't work out how to reference it from here.
+// See http://www.eclipse.org/jetty/documentation/current/npn-chapter.html for details
+ext.npnBootVersion = "1.1.6.v20130911"  // for JDK 1.7.0_45
+
+def startJettyServerRunConfiguration = """\
+    <configuration default="false" name="Jetty SPDY Server" type="Application" factoryName="Application" singleton="true">
+      <option name="MAIN_CLASS_NAME" value="com.thoughtworks.spdylab.server.JettySpdyServer" />
+      <option name="VM_PARAMETERS" value="-Xbootclasspath/p:./support/npn-boot-${project.ext.npnBootVersion}.jar" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://\$PROJECT_DIR\$/jetty" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="jetty" />
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>http://www.eclipse.org/jetty/documentation/current/npn-chapter.html
+"""
+
+def startExpressServerRunConfiguration = '''
+    <configuration default="false" name="ExpressJS SPDY Server" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="/usr/local/bin/node" path-to-js-file="app/js/service.js" working-dir="$PROJECT_DIR$/service" coffeescript-run="false">
+      <RunnerSettings RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="NodeJS.run" />
+      <method />
+    </configuration>
+'''
+
+idea.workspace.iws {
+    withXml { workspace ->
+        // Add run configurations for convenience
+        def runManagerComponentNode = workspace.node.component.find { it.@name == 'RunManager' }
+        runManagerComponentNode.append(new XmlParser().parseText(startJettyServerRunConfiguration))
+        runManagerComponentNode.append(new XmlParser().parseText(startExpressServerRunConfiguration))
+        runManagerComponentNode.@selected = 'Application.Jetty SPDY Server'
+    }
+}
+
