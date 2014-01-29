@@ -1,5 +1,4 @@
 // Download Jetty npn-boot JAR
-def npnBootVersion = rootProject.ext.npnBootVersion
 ant.mkdir(dir: "support")
 ant.get(src: "http://central.maven.org/maven2/org/mortbay/jetty/npn/npn-boot/${npnBootVersion}/npn-boot-${npnBootVersion}.jar",
         dest: "./support/npn-boot-${npnBootVersion}.jar",
@@ -25,7 +24,7 @@ dependencies {
     def jettyVersion = "9.1.1.v20140108"
     def slf4jVersion = "1.7.5"
 
-    compile "org.eclipse.jett/usr/bin/env nodey.spdy:spdy-http-server:${jettyVersion}",
+    compile "org.eclipse.jetty.spdy:spdy-http-server:${jettyVersion}",
             "org.eclipse.jetty:jetty-jmx:${jettyVersion}",
             "org.eclipse.jetty:jetty-security:${jettyVersion}",
             "org.eclipse.jetty:jetty-webapp:${jettyVersion}",

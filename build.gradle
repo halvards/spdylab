@@ -56,7 +56,7 @@ ext.npnBootVersion = "1.1.6.v20130911"  // for JDK 1.7.0_45
 def startJettyServerRunConfiguration = """\
     <configuration default="false" name="Jetty SPDY Server" type="Application" factoryName="Application" singleton="true">
       <option name="MAIN_CLASS_NAME" value="com.thoughtworks.spdylab.server.JettySpdyServer" />
-      <option name="VM_PARAMETERS" value="-Xbootclasspath/p:./support/npn-boot-${project.ext.npnBootVersion}.jar" />
+      <option name="VM_PARAMETERS" value="-Xbootclasspath/p:./support/npn-boot-${npnBootVersion}.jar" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://\$PROJECT_DIR\$/jetty" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -69,7 +69,7 @@ def startJettyServerRunConfiguration = """\
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
-    </configuration>http://www.eclipse.org/jetty/documentation/current/npn-chapter.html
+    </configuration>
 """
 
 def startExpressServerRunConfiguration = '''
