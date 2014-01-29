@@ -81,7 +81,7 @@ public class JettySpdyServer {
         // See: http://www.eclipse.org/jetty/documentation/current/advanced-embedding.html for details.
 
         ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase("../content");
+        resourceHandler.setResourceBase("../service/app/static");
         resourceHandler.setEtags(true);
         resourceHandler.setWelcomeFiles(new String[]{"index.html", "index.htm", "tw.html", "tw.htm"});
         server.setHandler(resourceHandler);

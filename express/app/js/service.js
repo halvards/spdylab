@@ -56,7 +56,7 @@ var getContentType = function(filename) {
 };
 
 var pushStaticContent = function(response) {
-  var staticDir = __dirname + '/../../../content/thoughtWorks_files/';
+  var staticDir = __dirname + '/../static/thoughtWorks_files/';
   fs.readdirSync(staticDir).forEach(function(filename) {
     if (fs.lstatSync(staticDir + filename).isFile()) {
       var stream = response.push('/thoughtWorks_files/' + filename, getContentType(filename));
@@ -72,13 +72,12 @@ app.get('/', function (request, response) {
     pushStaticContent(response);
   }
   response.writeHead(200, { 'content-type': 'text/html' });
-  response.end(fs.readFileSync(__dirname + '/../../../content/tw.html'));
+  response.end(fs.readFileSync(__dirname + '/../static/tw.html'));
 });
 
-// Serve files from the content directory in the project root directory
+// Serve files from the app/static directory
 app.get('/*', function (request, response) {
-  response.writeHead(200, getContentType(request.path));
-  response.end(fs.readFileSync(__dirname + '/../../../content' + request.path));
+  response.sendfile('app/static' + request.path);
 });
 
 var httpPort = 8080;
