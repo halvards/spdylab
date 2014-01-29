@@ -5,7 +5,6 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.spdy.server.NPNServerConnectionFactory;
 import org.eclipse.jetty.spdy.server.SPDYServerConnectionFactory;
 import org.eclipse.jetty.spdy.server.http.HTTPSPDYServerConnectionFactory;
@@ -26,8 +25,6 @@ public class JettySpdyServer {
 
     private void run(String[] args) throws Exception {
         Server server = new Server();
-        server.setDumpAfterStart(false);
-        server.setDumpBeforeStop(false);
 
         // Setup JMX
         MBeanContainer mbeanContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
@@ -103,13 +100,10 @@ public class JettySpdyServer {
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[]{resourceHandler, requestLogHandler});
 
-        StatisticsHandler statisticsHandler = new StatisticsHandler();
-        statisticsHandler.setHandler(handlers);
-        server.setHandler(statisticsHandler);
+        server.setHandler(handlers);
 
         server.setStopAtShutdown(true);
         server.start();
-        server.dumpStdErr();
         server.join();
     }
 }
