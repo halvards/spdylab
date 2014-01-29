@@ -1,6 +1,5 @@
 package com.thoughtworks.spdylab.server;
 
-import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
@@ -12,7 +11,6 @@ import org.eclipse.jetty.spdy.server.http.PushStrategy;
 import org.eclipse.jetty.spdy.server.http.ReferrerPushStrategy;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-import java.lang.management.ManagementFactory;
 import java.util.TimeZone;
 
 public class JettySpdyServer {
@@ -26,13 +24,9 @@ public class JettySpdyServer {
     private void run(String[] args) throws Exception {
         Server server = new Server();
 
-        // Setup JMX
-        MBeanContainer mbeanContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-        server.addBean(mbeanContainer);
-
         // Base HTTP configuration
         HttpConfiguration config = new HttpConfiguration();
-        config.setSecurePort(8443);
+//        config.setSecurePort(8443);
         config.addCustomizer(new ForwardedRequestCustomizer());
         config.addCustomizer(new SecureRequestCustomizer());
 
