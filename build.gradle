@@ -73,7 +73,7 @@ def startJettyServerRunConfiguration = """\
 """
 
 def startExpressServerRunConfiguration = '''
-    <configuration default="false" name="ExpressJS SPDY Server" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="/usr/local/bin/node" path-to-js-file="app/js/service.js" working-dir="$PROJECT_DIR$/express" coffeescript-run="false">
+    <configuration default="false" name="ExpressJS SPDY Server" type="NodeJSConfigurationType" factoryName="Node.js" singleton="true" path-to-node="/usr/local/bin/node" path-to-js-file="node_modules/supervisor/lib/cli-wrapper.js" application-parameters="-i node_modules app/js/service" working-dir="$PROJECT_DIR$/express" coffeescript-run="false">
       <RunnerSettings RunnerId="NodeJS.run" />
       <ConfigurationWrapper RunnerId="NodeJS.run" />
       <method />
