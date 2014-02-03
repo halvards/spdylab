@@ -6,7 +6,7 @@ logger.debugLevel = 'info';
 
 logger.log = function (level, message) {
   var level = level || 'info';
-  if (levels.indexOf(level.toLowerCase()) >= levels.indexOf(logger.debugLevel)) {
+  if (levels.indexOf(level.toLowerCase()) <= levels.indexOf(logger.debugLevel)) {
     if (typeof message !== 'string') {
       message = JSON.stringify(message);
     }
