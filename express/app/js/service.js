@@ -21,7 +21,7 @@ app.configure(function () {
   app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(spdyPush.referrerPush(__dirname + "/../static"));
+  app.use(spdyPush.referrerPush());
   app.use(app.router);
   app.enable('trust proxy');
 });
@@ -32,6 +32,11 @@ app.get('/hello', function (request, response) {
   response.send('Hello World!');
 });
 
+// Used to test json responses
+//app.get('/thoughtWorks_files/cookie_banner.js', function(request, response) {
+//  response.json({'hello': 'world'});
+//});
+
 // When the '/tw.html' home page is requested as '/', push some static resources as well
 app.get('/', function (request, response) {
 //  response.writeHead(200, { 'content-type': 'text/html' });
@@ -40,7 +45,6 @@ app.get('/', function (request, response) {
 
 // Serve files from the app/static directory
 app.get('/*', function (request, response) {
-//  response.sendfile('app/static' + request.path);
   response.end(fs.readFileSync(__dirname + '/../static' + request.path));
 });
 

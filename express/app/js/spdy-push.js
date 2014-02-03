@@ -1,8 +1,11 @@
 var fs = require('fs')
+  , http = require('http')
   , urlParse = require('url').parse
-  , logger = require('./logger');
+  , logger = require('./logger')
+  , expressRequest = require('express/lib/request')
+  , expressResponse = require('express/lib/response');
 
-logger.debugLevel = 'info';
+logger.debugLevel = 'debug';
 
 var pushRegexps = [
   /.*\.css/,
@@ -115,71 +118,62 @@ var getContentType = function(url) {
   return '';
 };
 
-var push = function(response, url, baseDir) {
+var push = function(req, res, url) {
   logger.info("Server push " + url);
-  var resource = fs.readFileSync(baseDir + url);
-  var headers = {
-    'content-type': getContentType(url),
-    'content-length': resource.length
+  var headers = { 'content-type': getContentType(url) };
+  var internalRequest = { __proto__: expressRequest, app: req.app };
+  internalRequest.socket = { remoteAddress: '127.0.0.1' };  // for logging
+  internalRequest.method = 'GET';
+  internalRequest.url = url;
+  internalRequest.params = {};
+  internalRequest.headers = {};
+  internalRequest.body = {};
+  internalRequest.query = {};
+  internalRequest.files = {};
+  var internalResponse = { __proto__: expressResponse, app: req.app };
+  var stream = res.push(url, headers);
+  internalResponse.end = function(data) {
+    stream.end(data);
   };
-  var stream = response.push(url, headers);
-  stream.on('acknowledgement', function () {
+  req.app.handle(internalRequest, internalResponse, function(error) {
+    logger.warn("Error when pushing resource [" + url + "]: " + error.message);
   });
-  stream.on('error', function (error) {
-    logger.warn("Error when pushing resource " + url + ": " + error);
-//    throw error;
-  });
-  stream.end(resource);
 };
 
-exports.referrerPush = function(baseDir) {
-  var baseResourceDir = baseDir ? baseDir : "";
-
-  return function(request, response, next) {
-//    logger.debug("Headers:" + Object.keys(request.headers));
-//    logger.debug("Protocol:" + request.protocol);
-//    logger.debug("host:" + request.host);
-//    logger.debug("hostname:" + request.hostname);
-//    logger.debug("hostport:" + request.headers.host);
-//    logger.debug("hostport2:" + request.headers['x-forwarded-host']);
-//    logger.debug("port:" + request.port);
-//    logger.debug("gethost:" + request.get('host'));
-//    logger.debug("getport:" + request.get('port'));
-//    logger.debug("app: " + Object.keys(request.app));
-//    logger.debug("app.settings: " + Object.keys(request.app.settings));
-//    logger.debug("settings.port: " + request.app.settings.port);
-    if (!response.push && typeof(a) !== 'function') {
-      logger.debug("Not handling SPDY server push for URL " + request.url + " because request.push does not exist or is not a function");
+exports.referrerPush = function() {
+  return function(req, res, next) {
+    if (!res.push && typeof(a) !== 'function') {
+      logger.debug("Not handling SPDY server push for URL " + req.url + " because req.push does not exist or is not a function");
       return next();
     }
-    if (request.method !== 'GET') {
-      logger.debug("Not handling SPDY server push for URL " + request.url + " because the HTTP method is " + request.method);
+    if (req.method !== 'GET') {
+      logger.debug("Not handling SPDY server push for URL " + req.url + " because the HTTP method is " + req.method);
       return next();
     }
-    if (request.headers['if-modified-since']) {
-      logger.debug("Not handling SPDY server push for URL " + request.url + " because If-Modified-Since header is present");
+    if (req.headers['if-modified-since']) {
+      logger.debug("Not handling SPDY server push for URL " + req.url + " because If-Modified-Since header is present");
       return next();
     }
-    logger.debug("handling server push for " + request.url);
-    if (isMainResource(request.url)) {
-      logger.debug("URL [" + request.url + "] is a main resource for SPDY server push");
-      var mainResource = getOrCreateMainResource(request.url);
+    logger.debug("Handling server push for " + req.url);
+    if (isMainResource(req.url)) {
+      logger.debug("URL [" + req.url + "] is a main resource for SPDY server push");
+      var mainResource = getOrCreateMainResource(req.url);
       var pushResources = mainResource.getPushResources();
-      logger.debug("Pushing resources for URL [" + request.url + "]: " + pushResources);
+      logger.debug("Pushing resources for URL [" + req.url + "]: " + pushResources);
       pushResources.forEach(function (pushResourceUrl) {
-        push(response, pushResourceUrl, baseResourceDir);
+        push(req, res, pushResourceUrl);
       });
-    } else if (isPushResource(request.url)) {
-      logger.debug("URL [" + request.url + "] is a push resource for SPDY server push");
-      var referrer = request.headers['referer'];
+    } else if (isPushResource(req.url)) {
+      logger.debug("URL [" + req.url + "] is a push resource for SPDY server push");
+      var referrer = req.headers['referer'];
       if (referrer) {
         var mainResource = getOrCreateMainResource(urlParse(referrer).path);
         var pushResources = mainResource.getPushResources();
-        if (pushResources.indexOf(request.url) === -1) {
-          mainResource.addPushResource(request.url, request.headers['host'], referrer);
+        if (pushResources.indexOf(req.url) === -1) {
+          mainResource.addPushResource(req.url, req.headers['host'], referrer);
         } else {
-          getOrCreateMainResource(request.url).getPushResources().forEach(function (pushResourceUrl) {
-            push(response, pushResourceUrl, baseResourceDir);
+          getOrCreateMainResource(req.url).getPushResources().forEach(function (pushResourceUrl) {
+            push(req, res, pushResourceUrl);
           });
         }
       }
