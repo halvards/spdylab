@@ -4,7 +4,7 @@ var express = require('express')
   , http = require('http')
   , https = require('https')
   , spdy = require('spdy')
-  , spdyPush = require('./spdy-push');
+  , spdyPush = require('spdy-referrer-push');
 
 // Set up server private key, public key certificate and CA certificate
 // The ciphers options prevents using some ciphers not supported by Wireshark, such as DH and CAMELLIA
@@ -21,7 +21,7 @@ app.configure(function () {
   app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(spdyPush.referrerPush());
+  app.use(spdyPush.referrer());
   app.use(app.router);
   app.enable('trust proxy');
 });
@@ -39,13 +39,12 @@ app.get('/hello', function (request, response) {
 
 // When the '/tw.html' home page is requested as '/', push some static resources as well
 app.get('/', function (request, response) {
-//  response.writeHead(200, { 'content-type': 'text/html' });
-  response.end(fs.readFileSync(__dirname + '/../static/tw.html'));
+  fs.createReadStream(__dirname + '/../static/tw.html').pipe(response);
 });
 
 // Serve files from the app/static directory
 app.get('/*', function (request, response) {
-  response.end(fs.readFileSync(__dirname + '/../static' + request.path));
+  fs.createReadStream(__dirname + '/../static' + request.path).pipe(response);
 });
 
 var httpPort = 8080;
