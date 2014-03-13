@@ -39,3 +39,8 @@ idea.module {
     downloadSources = true  // tells Ivy to download sources jar files as well
 }
 
+// http://www.gradle.org/docs/current/userguide/gradle_wrapper.html
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}
+
